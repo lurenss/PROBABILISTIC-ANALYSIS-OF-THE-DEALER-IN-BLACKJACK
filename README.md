@@ -1,2 +1,5 @@
 # PROBABILISTIC-ANALYSIS-OF-THE-DEALER-IN-BLACKJACK
-Probabilistic analysis of the the dealer in blackjack
+
+This is a project for the course CM0546	APPLIED PROBABILITY FOR COMPUTER SCIENCE held by Isadora Villalobos.
+
+
