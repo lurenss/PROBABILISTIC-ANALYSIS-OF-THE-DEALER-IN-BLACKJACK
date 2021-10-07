@@ -1,0 +1,145 @@
+---
+title: <center> PROBABILISTIC ANALYSIS <br> OF THE DEALER <br> IN BLACKJACK \center
+output: html_document
+bibliography: bibliography.bib
+nocite: |
+  @Thorpe, @NewsWatch, @Wikipedia
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<center><h3> Haley Derrod (887065), Lorenzo Padoan (862651), Francesco Trasforini (887156) \h3 </center>
+
+<center><h3> [CM0546] Applied Probability for Computer Science <br> December 8, 2020 \h3 </center>  
+
+# I.  HISTORY  
+<div style="text-align: justify">
+<div>
+  The origins of Blackjack are not entirely known, but many different cultures have a long history with some version of the game. The oldest known record of a game similar to Blackjack is the Spanish game Veintiuna, which is referenced in a Miguel De Cervantes tale "Rinconete y Cortadillo" (Novelas Ejemplares) dated 1601-1602. <br><br>
+  The French also have a history with the game, which they called Vingt-et-Un, which translates to "Twenty-one”. The first record of the game in France occured in 1768 and it was popular at the French Royal Court during the reign of King Louis XV. [@Depaulis] <br><br>
+  The closest ancestor of modern-day Blackjack is the English game Vingt-Un, a British version of the Spanish game Veintiuna. The first record of Vingt-Un in Britain occured just a fews years after it appeared in France. <br><br>
+  The exact origin of the name "Blackjack" is still unknown, but a popular myth states that it was forged in the 20th century by Nevada casinos in an effort to promote the game. They offered bonus payouts, including one that paid extra if a black jack (a jack of spades or clubs) was dealt along with an ace of spades. As the game became more popular, the bonus payouts became less common but the informal name was already stuck. <br><br>
+  However, French card historian Thierry Depaulis was able to debunk that myth of Blackjack's name origin in 2009, in a lecture given at the 2009 I.P.C.S. Convention in Toronto titled "Dawson's Game: Blackjack and the Klondike." He was unable to find any historical evidence of a special bonus for having the combination of an ace with a black jack. Instead, his research points out that the name was most likely coined by prospectors during the Klondike Gold Rush. Given that prospectors used the term 'blackjack' when referring to the mineral zincblende, often associated with gold or silver deposits, Depaulis suggests that the mineral name was transferred by them to the top bonus in the game. <br>
+
+# II.  RULES   
+  Blackjack is a game played with a standard deck of 52 cards among a dealer and one to seven players. In this document, we will consider games played between a dealer and only one player. Keep in mind that slight variations of the rules are enforced in different establishments. <br><br>
+  A player's hand is a winning one if it is subject to two conditions: its total does not exceed 21 and it is also greater than the total of the dealer's hand. The total of a hand is computed by summing the value of all the player's cards. Each number card takes its own value and all face cards are assigned the value "10." Aces act as an exception and can be counted as “1” or “11” on a player's choice. A “soft hand” is hand which contains an ace that can be counted as an “11” without causing the total to exceed 21, otherwise it is called a "hard hand." <br><br>
+  Before play begins, the dealer shuffles the cards and one player “cuts” them. The dealer takes a card out of play (“burns” a card) by placing it face up on the bottom of the deck. Every player must place a bet before any card is dealt, except “insurance" bets which will be explained later. The minimum and maximum bet sizes are established by the house in advance. <br><br>
+  The dealer distributes two cards to himself, one face up and one face down, and two to each player, both facing down (or both facing up, depending on the casino). The faced down card received by the dealer and the set of cards dealt to the players are called “hole cards”. <br>
+  If the “hole cards” of a player or of the dealer are a 10-valued card and an ace, they constitute a “natural”. Whenever a player is dealt a “natural” and the dealer is not, the player wins the hand and he is paid 3/2 times his original bet from the dealer. If a player does not have a “natural” and the dealer does, the player loses his original bet. If both have a "natural", it’s a tie and no exchange of money takes place. <br><br>
+  It can occur that a player’s “hole cards” happen to have the same value, forming a pair. When this event takes place, the player can choose to split the pair and play two separate hands. If the player elects to do so, he must place a bet equal to the original on each hand. The dealer serves a second face down card on each of the split cards. The two hands are played as regular ones, with few exceptions: 
+
+<ul style="list-style-type:disc">
+  <li>“Hole cards” do not constitute a “natural” even if they are an ace and a 10-valued card</li>
+  <li>If the split cards were aces, the player receives only one card on each of them</li>
+  <li>The player cannot split his hand further, even if he receives a third card of the same value</li>
+</ul>
+
+  The draw phase starts at the left of the dealer and proceeds clockwise. The first player looks at his cards and chooses if he wants to draw an extra card (“hit”) or not (“stand”). A player can also “double down," in which case he will double his bet and draw just one card. “Doubling down” is allowed on split pairs, except on aces. <br><br>
+  If the dealer’s face up card is an ace, the player is allowed to place an “insurance” bet half the size of his original bet before drawing. If the player elects to make the “insurance” bet, the dealer checks his second “hole card”. If the dealer has a “natural”, the player wins twice his side bet. If the dealer does not hold a “natural”, the original bet is settled following the usual rules. <br><br>
+  A player may choose to keep asking for additional cards as long as he does not "bust" (exceed a hand total of 21). If the player “busts”, he loses his original bet and the round ends. In the case that he elects to "stand", the dealer turns up his “hole card”. As long as his total is less than or equal to 16, the dealer must continue to draw cards. When his total reaches a greater than or equal to 17, he must stand. If the dealer "busts", the player wins the bet. In the case that neither the player nor the dealer "busts", the bet is settled in favor of the person holding the higher total. In the event of a tie, called a “push”, no money is exchanged. <br>
+
+# III.  CASE STUDY
+  In our case study, we are going to look at the evolution of the dealer's hand. In particular, we are going to compute the probability of "busting" after the next draw, given the dealer's current hand. For simplicity, we are going to fix the ace's value to "1". <br><br>
+  The problem at hand is the following: The dealer is dealt two random cards. As long as the sum value of his cards is less than 17, he must keep drawing cards, as the traditional blackjack rules prescribe. <br>
+  We define this event with the following state transition matrix, where $p_{i,j}=Pr[j|i]$ is the probability of moving from state $i$ to state $j$ in one step. <br>
+
+<center>
+$x=\{\textrm{Sum of the values of the cards in hand}\}$ <br>
+<br>
+$p_{i,j}=\{X_{k+1}=s_{j}|X_{k}=s_{i}\}$
+<br>
+<br>
+$P=\begin{bmatrix}p_{0,0}&p_{0,1}&p_{0,2}&...&p_{0,B}\\p_{1,0}&p_{1,1}&p_{1,2}&...&p_{1,B}\\p_{2,0}&p_{2,1}&p_{2,2}&...&p_{2,B}\\...\\...\\...\\p_{B,0}\end{bmatrix}$
+<br>
+\center
+<br>
+<div style="text-align: justify">
+
+  By construction, the matrix rows are indexed on the current state, while the matrix columns are indexed on the next state. <br><br>
+  The state space is $S=\{0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,B\}$, where state $B$ represents the "bust state".<br><br>
+  The initial state is $s_0=0$ by definition, when no card has been dealt.<br><br>
+  By the dealer's rule, the subset of states $17,18,19,20,21,B$ are "absorbing states". An absorbing state is a state $i$ such that $Pr[j|i]=0$ for any $j≠i$, meaning that there is no escaping state $i$ once it is reached [@Ethier, pp. 671]. One interesting property of the transition matrix of this game is that $p_{i,j}=Pr[i|j]=0$ for any $i,j$ such that $i>j$. This property holds also for $i=j$, with the exceptions of the subset of "absorbing states", for which $p_{i,i}=Pr[i|i]=1$ by definition. This property states that the process $X$ is strictly growing until it reaches one of the absorbing states. When that condition is met, the process becomes stationary. <br><br>
+  We claim that the process is not Markovian because the memoryless property does not hold. The intuition behind our claim is the following:<br>
+  Suppose the initial state is $i=7$. The probability of transitioning in one step to state $j=9$ depends on the cards drawn. In fact, suppose state $i$ has been reached by drawing three 2-valued cards and an ace. So $p_{7,9}=Pr[9|7]=\frac{1}{48}$ because the only card that achieves the transition from state $7$ to state $9$ in one step is the only 2-valued card left in the deck, where 48 is the number of cards still in the deck.<br><br>
+  The transition probability would be different if state $i=7$ had been reached by drawing a single 7-valued card. In this case, $p_{7,9}=Pr[7|9]=\frac{1}{12}$ because there would still be four 2-valued cards in the deck. So the transition probability $p_{i,j}$ does not depend only on the current state, but it also depends on how the current state has been reached. In the simulation below we are not going to deal with the transition matrix.
+
+<div style="text-align: left">
+# IV.   SIMULATION DEALER GAME
+```{r simulation}
+
+# Deck initialization
+deck <- c(rep(1,4), rep(2,4), rep(3,4), rep(4,4), rep(5,4), rep(6,4), rep(7,4), rep(8,4), rep(9,4), rep(10,16))
+
+limit = 21 # Maximum value before going "bust"
+
+stop_draw = 17 # Value at which the dealer must stop drawing new cards
+
+max_hand_size = 10 # the maximum hand size before dealer must stop drawing cards, given a single deck and the stop_draw limit (i.e. A, A, A, A, 2, 2, 2, 2, 3, 3 = 18)
+
+deal_cards <- rep(0,max_hand_size) # Holds the cards the dealer is dealt
+
+psurvival <- rep(0,max_hand_size) # Holds the sequence of survival probabilities that will be generated after each of the dealer's card draws
+
+# Function to simulate drawing a card from the deck
+draw <- function () {
+  # dc = drawn card
+  dc <- sample(deck, size=1, replace=FALSE)
+  
+  # remove dc from deck
+  deck <<- deck[-match(dc,deck)]
+  
+  return(dc)
+}
+
+# Function to calculate the probability of survival
+prob_survival <- function() {
+  total <- sum(deal_cards)
+  
+  max_card = limit - total
+  
+  num_bust = sum(deck>max_card) # Number of cards with value greater than max_card
+  
+  psurvival = 1 - (num_bust/sum(deck>0))
+  
+  return(psurvival)
+}
+
+# Mock game
+
+# serve 2 cards to the player and 1 to the dealer
+for (i in 1:2) {
+  deal_cards[i] <- draw()
+}
+
+total <- sum(deal_cards)  # total of the dealer's hand
+
+# Dealer's actions in the game
+counter <- 0
+while(total < stop_draw){
+  i <- i+1
+  psurvival[i-2] <- prob_survival()
+  deal_cards[i] <- draw()
+  counter <- counter+1
+  total <- sum(deal_cards)
+}
+
+# Holds values to output in game summary below
+output_cards <- deal_cards[1:i]  
+output_psurvival <- psurvival[1:(i-2)]  
+
+```
+<br>
+The dealer was initially dealt two cards: `r output_cards[1:2]` <br>
+If the dealer draws another card his probability of survival is: `r output_psurvival[1]`  <br><br>
+In this game the dealer drew `r counter` time(s) and his total was `r total` <br>
+His hand was `r output_cards` and his probability of survival for each step is shown in this sequence:
+`r round(output_psurvival[1:(i-2)], digits = 3)`
+
+
+<div style="text-align: left">
+# V. Refereneces
+
+\div
